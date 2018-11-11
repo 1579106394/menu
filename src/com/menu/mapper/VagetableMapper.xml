@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.menu.mapper.VagetableMapper">
+
+    <resultMap id="Vagetable" type="vagetable">
+        <id column="vage_id" property="vageId" />
+        <result column="vage_name" property="vageName" />
+        <result column="vage_num" property="vageNum" />
+        <result column="vage_price" property="vagePrice" />
+        <result column="vage_delete" property="vageDelete" />
+        <association property="type" javaType="Type">
+            <id property="typeId" column="type_id" />
+            <result property="typeName" column="type_name" />
+            <result property="typeNum" column="type_num" />
+        </association>
+    </resultMap>
+
+    <select id="getVageList" parameterType="vagetable" resultMap="Vagetable">
+        select * from vagetable v left join type t
+        on v.vage_type = t.type_id
+        where v.vage_delete = 1
+        <if test="vageName != '' and vageName != null">
+            and v.vage_name like '%${vageName}%'
+        </if>
+        <if test="type != null">
+            <if test="type.typeId != null and type.typeId != '' and type.typeId != 'all'">
+                and v.vage_type = #{type.typeId}
+            </if>
+        </if>
+    </select>
+
+    <select id="getVageListByOrder" resultMap="Vagetable">
+        select * from order_vage ov LEFT JOIN vagetable v
+        on ov.vage_id = v.vage_id left JOIN type t
+        on v.vage_type = t.type_id
+        and ov.order_id = #{value}
+    </select>
+
+    <select id="getVageById" resultMap="Vagetable">
+        select * from vagetable v left join type t
+        on v.vage_type = t.type_id
+        where v.vage_delete = 1
+        and v.vage_id = #{value}
+    </select>
+
+    <insert id="addVage" parameterType="vagetable">
+        insert into vagetable values
+        (#{vageId}, #{vageName}, #{type.typeId}, #{vageNum}, #{vagePrice}, #{vageDelete})
+    </insert>
+
+    <update id="deleteVage">
+        update vagetable set
+        vage_delete = 2
+        where vage_id = #{value}
+    </update>
+
+    <update id="editVage" parameterType="vagetable">
+        update vagetable set
+        vage_name = #{vageName},
+        vage_type = #{type.typeId},
+        vage_num = #{vageNum},
+        vage_price = #{vagePrice}
+        where vage_id = #{vageId}
+    </update>
+
+    <select id="priceSum" parameterType="orderVo" resultType="Double">
+        select sum(vage_price) from vagetable
+        where vage_id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

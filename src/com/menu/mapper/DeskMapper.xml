@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.menu.mapper.DeskMapper">
+
+    <resultMap id="Desk" type="desk">
+        <id column="desk_id" property="deskId" />
+        <result column="desk_name" property="deskName" />
+        <result column="desk_num" property="deskNum" />
+        <association property="room" column="desk_room" javaType="Room">
+            <id column="room_id" property="roomId" />
+            <result column="room_name" property="roomName" />
+        </association>
+    </resultMap>
+
+    <select id="deskList" resultMap="Desk">
+        select * from desk d left join room r
+        on d.desk_room = r.room_id
+    </select>
+
+    <insert id="addDesk" parameterType="desk">
+        insert into desk values
+        (#{deskId}, #{deskName}, #{room.roomId}, #{deskNum})
+    </insert>
+
+    <delete id="deleteDeskById">
+        delete from desk
+        where desk_id = #{value}
+    </delete>
+
+    <select id="getDeskById" resultMap="Desk">
+        select * from desk
+        where desk_id = #{value}
+    </select>
+
+    <update id="editDesk" parameterType="desk">
+        update desk set
+        desk_name = #{deskName},
+        desk_num = #{deskNum},
+        desk_room = #{room.roomId}
+        where desk_id = #{deskId}
+    </update>
+
+    <select id="getDeskListByRoom" parameterType="room" resultMap="Desk">
+        select * from desk
+        where desk_room = #{roomId}
+    </select>
+
+</mapper>

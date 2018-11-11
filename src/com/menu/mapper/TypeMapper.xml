@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.menu.mapper.TypeMapper">
+
+    <resultMap id="Type" type="type">
+        <id property="typeId" column="type_id" />
+        <result property="typeName" column="type_name" />
+        <result property="typeNum" column="type_num" />
+    </resultMap>
+
+	<select id="getTypeList" resultMap="Type">
+		select * from type
+	</select>
+	
+	<delete id="deleteTypeById">
+		delete from type
+		where type_id = #{value}
+	</delete>
+	
+	<select id="getType" parameterType="type" resultMap="Type">
+		select * from type where type_id = #{typeId}
+	</select>
+	
+	<update id="editType" parameterType="type">
+		update type set
+		type_name = #{typeName}
+		<if test="typeNum != null">
+			,type_num = #{typeNum}
+		</if>
+		where type_id = #{typeId}
+	</update>
+	
+	<insert id="addType" parameterType="type">
+		insert into type values
+		(#{typeId}, #{typeName}, #{typeNum})
+	</insert>
+
+	<select id="getTypeCount" parameterType="type" resultType="Integer">
+		select sum(vage_num) from vagetable
+		where vage_type = #{typeId}
+	</select>
+	
+</mapper>
